@@ -77,35 +77,32 @@ public class World : MonoBehaviour
     }
 
         private void GenerateVoxels(ChunkData data)
-    {
+        {
+            var airGapHeight = chunkHeight/ 1.5;
         for (int x = 0; x < data.chunkSize; x++)
         {
             for (int z = 0; z < data.chunkSize; z++)
             {
                 int groundPosition =0;
+                
                 for (int y = 0; y < chunkHeight; y++)
                 {
                     BlockType voxelType = BlockType.Dirt;
-                    if (y > groundPosition)
+                    if (y >= chunkHeight-airGapHeight)
                     {
-                        if (y < waterThreshold)
-                        {
-                            voxelType = BlockType.Grass_Dirt;
-                        }
-                        else
-                        {
-                            voxelType = BlockType.Air;
-                        }
+                        voxelType = BlockType.Air;
                     
                     }
-                    else if (y == groundPosition && y < waterThreshold)
-                    {
-                        voxelType = BlockType.Sand;
-                    }
+                    
                     else if (y == groundPosition)
                     {
+                        voxelType = BlockType.Sand;
+                    }else 
+                    {
                         voxelType = BlockType.Grass_Dirt;
+
                     }
+                    
 
                     Chunk.SetBlock(data, new Vector3Int(x, y, z), voxelType);
                 }
@@ -113,21 +110,22 @@ public class World : MonoBehaviour
         }
     }
 
-        public void EditBlock(ChunkData chunkData,ChunkRenderer chunkRenderer,RaycastHit hit,BlockType blockType)
+        public void EditBlock(ChunkData chunkData,ChunkRenderer chunkRenderer,Vector3 worldPos,Vector3 normal,BlockType blockType)
         {
-            var pos = GetBlockPos(hit);
+            var pos = GetBlockPos(worldPos,normal);
             print("Block pos "+pos);
-            Chunk.SetBlock(chunkData,pos,blockType);
+            var blockChunkPos = Chunk.GetBlockInChunkCoordinates(chunkData, pos);
+            Chunk.SetBlock(chunkData,blockChunkPos,blockType);
             chunkRenderer.UpdateChunk();
             
         }
         
-        private Vector3Int GetBlockPos(RaycastHit hit)
+        private Vector3Int GetBlockPos(Vector3 worldPos,Vector3 normal)
         {
             Vector3 pos = new Vector3(
-                GetBlockPositionIn(hit.point.x, hit.normal.x),
-                GetBlockPositionIn(hit.point.y, hit.normal.y),
-                GetBlockPositionIn(hit.point.z, hit.normal.z)
+                GetBlockPositionIn(worldPos.x, normal.x),
+                GetBlockPositionIn(worldPos.y, normal.y),
+                GetBlockPositionIn(worldPos.z, normal.z)
             );
 
             return Vector3Int.RoundToInt(pos);
@@ -170,6 +168,7 @@ public class World : MonoBehaviour
     public void LoadMapFromFile()
     {
         var file = File.ReadAllText(Path.Combine("C:/Users/ahmed/OneDrive/Desktop/Maps", "voxel.json"));
+        
          var chunks= JsonConvert.DeserializeObject<List<ChunkData>>(file);
          chunkDataDictionary.Clear();
          foreach (ChunkRenderer chunk in chunkDictionary.Values)

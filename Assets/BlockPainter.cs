@@ -9,6 +9,9 @@ public class BlockPainter : MonoBehaviour
     private LayerMask Blockmask;
 
     private World world;
+    [SerializeField] private BrushVoxel brushVoxel;
+    private Vector3 midPoint;
+
     private void Start()
     {
         Cam=Camera.main;
@@ -18,32 +21,28 @@ public class BlockPainter : MonoBehaviour
 
     public void CastRay(BlockType blockType)
     {
-        var midPoint = Cam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.5f));
+       
 
-        RaycastHit hit;
-        Debug.DrawLine(midPoint,(midPoint )+transform.forward*100,Color.black,10);
-        if (Physics.Raycast(midPoint,transform.forward,out hit,100,Blockmask))
-        {
-            print("Ground Hit");
-
-            var chunkRender = hit.collider.gameObject.GetComponent<ChunkRenderer>();
-            world.EditBlock(chunkRender.ChunkData,chunkRender,hit,blockType);
-
-        }
+        
+       
 
         
     }
 
     private void FixedUpdate()
     {
-        if (Input.GetMouseButtonDown(0))
+        RaycastHit hit;
+        midPoint = Cam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.5f));
+
+        if (Physics.Raycast(midPoint,transform.forward,out hit,100,Blockmask))
         {
-            CastRay(BlockType.Air);
+
+            var chunkRender = hit.collider.gameObject.GetComponent<ChunkRenderer>();
+             world.EditBlock(chunkRender.ChunkData,chunkRender,hit.point,hit.normal,blockType);
+            //Debug.DrawLine(midPoint,(midPoint )+transform.forward*100,Color.black,1);
+            brushVoxel.transform.position = hit.point ;
+
+
         }
-        else if (Input.GetMouseButtonDown(1))
-        {
-            
-        }
-     
     }
 }

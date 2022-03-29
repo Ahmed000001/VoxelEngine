@@ -35,6 +35,7 @@ public class ChunkRenderer : MonoBehaviour
         meshCollider = GetComponent<MeshCollider>();
         mesh = meshFilter.mesh;
         mesh.indexFormat = IndexFormat.UInt32;
+        
     }
 
     public void InitializeChunk(ChunkData data)
@@ -61,7 +62,7 @@ public class ChunkRenderer : MonoBehaviour
         collisionMesh.triangles = meshData.colliderTriangles.ToArray();
         collisionMesh.RecalculateNormals();
 
-        meshCollider.sharedMesh = collisionMesh;
+        meshCollider.sharedMesh = mesh;
     }
 
     public void UpdateChunk()
