@@ -19,17 +19,8 @@ public class BlockPainter : MonoBehaviour
         world = FindObjectOfType<World>();
     }
 
-    public void CastRay(BlockType blockType)
-    {
-       
 
-        
-       
-
-        
-    }
-
-    private void FixedUpdate()
+    private void Update()
     {
         RaycastHit hit;
         midPoint = Cam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.5f));
@@ -37,10 +28,15 @@ public class BlockPainter : MonoBehaviour
         if (Physics.Raycast(midPoint,transform.forward,out hit,100,Blockmask))
         {
 
-            var chunkRender = hit.collider.gameObject.GetComponent<ChunkRenderer>();
-             world.EditBlock(chunkRender.ChunkData,chunkRender,hit.point,hit.normal,blockType);
+            //var chunkRender = hit.collider.gameObject.GetComponent<ChunkRenderer>();
+           //  world.EditBlock(chunkRender.ChunkData,chunkRender,hit.point,hit.normal,blockType);
             //Debug.DrawLine(midPoint,(midPoint )+transform.forward*100,Color.black,1);
-            brushVoxel.transform.position = hit.point ;
+            var y = hit.point.y;
+            var intpos = Vector3Int.RoundToInt(hit.point);
+            brushVoxel.transform.position =new Vector3(intpos.x,y,intpos.z);
+            var localPos = brushVoxel.transform.localPosition;
+            brushVoxel.transform.localPosition = new Vector3(localPos.x, localPos.y + 0.5f, localPos.z);
+            brushVoxel.transform.up = hit.normal;
 
 
         }

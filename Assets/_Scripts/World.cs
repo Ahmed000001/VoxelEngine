@@ -110,14 +110,28 @@ public class World : MonoBehaviour
         }
     }
 
-        public void EditBlock(ChunkData chunkData,ChunkRenderer chunkRenderer,Vector3 worldPos,Vector3 normal,BlockType blockType)
+        public void EditBlocksData(ChunkRenderer[] chunkRenderers,Vector3[] worldPos,Vector3[] normal,BlockType blockType)
         {
-            var pos = GetBlockPos(worldPos,normal);
-            print("Block pos "+pos);
-            var blockChunkPos = Chunk.GetBlockInChunkCoordinates(chunkData, pos);
-            Chunk.SetBlock(chunkData,blockChunkPos,blockType);
-            chunkRenderer.UpdateChunk();
             
+            for (int i = 0; i < worldPos.Length; i++)
+            {
+              var point= GetBlockPos(worldPos[i],normal[i]);
+              var blockChunkPos = Chunk.GetBlockInChunkCoordinates(chunkRenderers[i].ChunkData, point);
+              Chunk.SetBlock(chunkRenderers[i].ChunkData,blockChunkPos,blockType);
+
+            }
+            UpdateChunksRender(chunkRenderers);
+        }
+
+        public void UpdateChunksRender(ChunkRenderer[] chunkRenderers)
+        {
+
+            foreach (var chunkRenderer in chunkRenderers)
+            {
+                chunkRenderer.UpdateChunk();
+
+            }
+
         }
         
         private Vector3Int GetBlockPos(Vector3 worldPos,Vector3 normal)
